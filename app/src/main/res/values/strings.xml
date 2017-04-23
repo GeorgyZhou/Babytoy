@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">babytoy</string>
+    <string name="continue_feed">继续饲养</string>
+    <string name="user_achievement">我的成就</string>
+    <string name="begin_feed">领取蚕蛹</string>
+    <string name="begin_progress_text">0</string>
+    <string name="title_activity_game">GameActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

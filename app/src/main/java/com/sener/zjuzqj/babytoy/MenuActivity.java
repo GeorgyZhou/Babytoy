@@ -1,14 +1,19 @@
 package com.sener.zjuzqj.babytoy;
 
-import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuActivity extends Activity implements View.OnClickListener{
+
+    public static final int NEW_GAME = 1;
+    public static final int CONTINUE_GAME = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,7 +21,33 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         ImageView imageView = (ImageView) findViewById(R.id.menu_background);
+
+        Button beginButton = (Button) findViewById(R.id.begin_button);
+        Button continueButton = (Button) findViewById(R.id.continue_button);
+        Button achievementButton = (Button) findViewById(R.id.achievement_button);
+
+        beginButton.setOnClickListener(this);
+        continueButton.setOnClickListener(this);
+        achievementButton.setOnClickListener(this);
+
         GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
         Glide.with(this).load(R.drawable.anim1).into(imageViewTarget);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.begin_button){
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("STATE", NEW_GAME);
+            startActivity(intent);
+        }
+        else if(v.getId() == R.id.achievement_button){
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("STATE", CONTINUE_GAME);
+            startActivity(intent);
+        }
+        else if(v.getId() == R.id.continue_button){
+
+        }
     }
 }

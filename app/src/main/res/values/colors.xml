@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="orange_button">#ffc106</color>
+    <color name="white">#ffffff</color>
+    <color name="colorButtonBorder">#8b572a87</color>
+    <color name="colorPBGray">#e7eaf1</color>
+    <color name="colorPBGreen">#95e911</color>
+    <color name="colorPBOrange">#ffc106</color>
+    <color name="black_overlay">#66000000</color>
 </resources>
