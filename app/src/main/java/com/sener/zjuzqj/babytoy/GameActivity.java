@@ -2,6 +2,7 @@ package com.sener.zjuzqj.babytoy;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.support.percent.PercentFrameLayout;
 import android.support.percent.PercentLayoutHelper;
 import android.support.v7.app.AppCompatActivity;
@@ -18,11 +19,15 @@ public class GameActivity extends Activity {
 
     private int progress = 0;
     private int state = 0;
+    private static final int REQUEST_ENABLE_BT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        int state = getIntent().getIntExtra("STATE", 0);
+
 
         ImageView imageView = (ImageView) findViewById(R.id.game_gif);
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.game_process_bar);
@@ -32,9 +37,12 @@ public class GameActivity extends Activity {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
-            
+            // TODO: 4/22/17
         }
-
+        if (!mBluetoothAdapter.isEnabled()){
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
 
 
 
