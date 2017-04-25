@@ -29,5 +29,6 @@ dependencies {
     compile 'com.android.support:percent:25.3.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support:support-v4:25.3.0'
+    compile 'com.clj.fastble:FastBleLib:1.0.6'
     testCompile 'junit:junit:4.12'
 }
