@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.icu.util.Output;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.percent.PercentFrameLayout;
 import android.support.percent.PercentLayoutHelper;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,43 +17,98 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.gifdecoder.GifDecoder;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.clj.fastble.BleManager;
-import com.clj.fastble.scan.ListScanCallback;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 public class GameActivity extends Activity {
 
-    private int progress = 0;
-    private int game_state = 0;
+    private int state_progress;
+    private int game_state;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "GAME_ACTIVITY";
     private static final long TIME_OUT = 5000;
     private static final String MAC_ADDRESS_1 = "";
     private static final String MAC_ADDRESS_2 = "";
     private static final String mUUID = "16fd2706-8baf-433b-82eb-8c7fada847da";
+    public static final int MESSAGE_READ = 1;
+    public static final int MESSAGE_WRITE = 2;
+    public static final int CONNECT_FINISH = 0;
+    public static final int SUCCESS_PLAY = 3;
     private BluetoothAdapter mBluetoothAdapter;
+    private ProgressBar progressBar;
+    private ImageView imageView;
+    private TextView textView;
+    private Handler mHandler;
+    private Integer defaultAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        int state = getIntent().getIntExtra("STATE", 0);
+        game_state = getIntent().getIntExtra("STATE", 0);
+        state_progress = getIntent().getIntExtra("PROGRESS", 0);
 
-        ImageView imageView = (ImageView) findViewById(R.id.game_gif);
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.game_process_bar);
-        TextView textView = (TextView) findViewById(R.id.game_process_bubble);
+        mHandler = new Handler(new Handler.Callback() {
 
-        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
-        Glide.with(this).load(R.drawable.anim2).into(imageViewTarget);
+            @Override
+            public boolean handleMessage(Message msg) {
+                switch(msg.what){
+                    case CONNECT_FINISH:
+                        communicateWithDevice((BluetoothSocket)msg.obj);
+                        break;
+                    case MESSAGE_READ:
+                        String info = new String((byte[])msg.obj);
+
+                        updateProgressView(0);
+                        switch(info){
+                            case "LA":
+                                updateAnimation(R.drawable.anim2);
+                            case "SA":
+                                updateAnimation(R.drawable.anim3);
+                            case "GA":
+                                updateAnimation(R.drawable.anim4);
+                            case "LB":
+                                updateAnimation(R.drawable.anim6);
+                            case "SB":
+                                updateAnimation(R.drawable.anim6);
+                            case "GB":
+                                updateAnimation(R.drawable.anim7);
+                            default:
+                                if(game_state == 0){
+
+                                } else if(game_state == 1){
+
+                                }
+                        }
+                        break;
+                    case MESSAGE_WRITE:
+
+                        break;
+                    case SUCCESS_PLAY:
+                        updateAnimation(defaultAnimation);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        imageView = (ImageView) findViewById(R.id.game_gif);
+        progressBar = (ProgressBar) findViewById(R.id.game_process_bar);
+        textView = (TextView) findViewById(R.id.game_process_bubble);
+
+        defaultAnimation = R.drawable.anim1;
+
+        updateAnimation(defaultAnimation);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter == null){
@@ -72,6 +125,7 @@ public class GameActivity extends Activity {
         }
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
@@ -82,12 +136,29 @@ public class GameActivity extends Activity {
         }
     }
 
+    private void communicateWithDevice(BluetoothSocket mSocket){
+        CommunicationThread communicationThread = new CommunicationThread(mSocket);
+        communicationThread.start();
+    }
+
+    private void connectToDevice(){
+        BluetoothDevice device;
+        if ( 0 <= game_state && game_state <= 3) {
+            device = mBluetoothAdapter.getRemoteDevice(MAC_ADDRESS_1);
+        }
+        else{
+            device = mBluetoothAdapter.getRemoteDevice(MAC_ADDRESS_2);
+        }
+        ConnectThread connectThread = new ConnectThread(device);
+        connectThread.start();
+    }
+
 
     private class ConnectThread extends Thread{
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
-        public ConnectThread(BluetoothDevice device){
+        private ConnectThread(BluetoothDevice device){
             BluetoothSocket tmp = null;
             mmDevice = device;
             try{
@@ -116,7 +187,8 @@ public class GameActivity extends Activity {
                 return;
             }
 
-            manageConnectSocket();
+            mHandler.obtainMessage(CONNECT_FINISH, mmSocket)
+                    .sendToTarget();
         }
 
         public void cancel(){
@@ -128,12 +200,12 @@ public class GameActivity extends Activity {
         }
     }
 
-    private class ManageThread extends Thread {
+    private class CommunicationThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
-        public ManageThread(BluetoothSocket socket) {
+        private CommunicationThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -143,7 +215,9 @@ public class GameActivity extends Activity {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
@@ -172,36 +246,78 @@ public class GameActivity extends Activity {
         public void write(byte[] bytes) {
             try {
                 mmOutStream.write(bytes);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
         }
 
         /* Call this from the main activity to shutdown the connection */
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
         }
     }
 
 
-    private void connectToDevice(){
-        BluetoothDevice device;
-        if ( 0 <= game_state && game_state <= 3) {
-            device = mBluetoothAdapter.getRemoteDevice(MAC_ADDRESS_1);
+    private void updateProgressView(int type){
+        switch(type){
+            case 1:
+                state_progress += 10;
+                break;
+            case 0:
+                state_progress += 2;
+                break;
         }
-        else{
-            device = mBluetoothAdapter.getRemoteDevice(MAC_ADDRESS_2);
+        if(state_progress >= 100){
+            game_state++;
+            if(game_state == 2){
+                Intent intent = new Intent(this, ResultActivity.class);
+                intent.putExtra("STATE", 0);
+                startActivity(intent);
+            }else if(game_state == 1){
+                state_progress = 0;
+                defaultAnimation = R.drawable.anim5;
+            }
         }
-        ConnectThread connectThread = new ConnectThread(device);
-        connectThread.start();
 
-    }
-
-
-    private void updateProgressView(View view){
-        PercentFrameLayout.LayoutParams params =(PercentFrameLayout.LayoutParams) view.getLayoutParams();
+        // Update TextView Location
+        PercentFrameLayout.LayoutParams params =(PercentFrameLayout.LayoutParams) textView.getLayoutParams();
         PercentLayoutHelper.PercentLayoutInfo layoutInfo = params.getPercentLayoutInfo();
-        layoutInfo.leftMarginPercent= (float)(0.68 + progress / 100.0 * 0.2);
-        view.requestLayout();
+        layoutInfo.leftMarginPercent= (float)(0.68 + state_progress / 100.0 * 0.2);
+        textView.requestLayout();
+
+        // update progress bar
+        progressBar.setProgress(state_progress);
+    }
+
+    private void updateAnimation(Integer resId){
+        if(resId != R.drawable.anim1 && resId != R.drawable.anim4) {
+
+            Glide.with(this).load(resId).listener(new RequestListener<Integer, GlideDrawable>() {
+                @Override
+                public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    GifDrawable drawable = (GifDrawable) resource;
+                    GifDecoder decoder = drawable.getDecoder();
+                    int duration = 0;
+
+                    for (int i = 0; i < drawable.getFrameCount(); i++) {
+                        duration += decoder.getDelay(i);
+                    }
+                    mHandler.sendEmptyMessageDelayed(SUCCESS_PLAY, duration * 5);
+
+                    return false;
+                }
+            }).into(new GlideDrawableImageViewTarget(imageView, 5));
+        }else{
+            Glide.with(this).load(resId).into(new GlideDrawableImageViewTarget(imageView));
+        }
     }
 }

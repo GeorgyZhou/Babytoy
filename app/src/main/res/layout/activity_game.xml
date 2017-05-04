@@ -29,5 +29,7 @@
         android:background="@drawable/progress_bubble"
         android:text="@string/begin_progress_text"/>
 
+    <LinearLayout>
+
 
 </android.support.percent.PercentFrameLayout>
