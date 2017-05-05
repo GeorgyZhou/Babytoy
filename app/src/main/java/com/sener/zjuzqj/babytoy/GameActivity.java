@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.support.percent.PercentFrameLayout;
 import android.support.percent.PercentLayoutHelper;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,6 +29,9 @@ import com.bumptech.glide.request.target.Target;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class GameActivity extends Activity {
@@ -43,12 +48,19 @@ public class GameActivity extends Activity {
     public static final int MESSAGE_WRITE = 2;
     public static final int CONNECT_FINISH = 0;
     public static final int SUCCESS_PLAY = 3;
+    public static final int PROMPT = 4;
     private BluetoothAdapter mBluetoothAdapter;
     private ProgressBar progressBar;
     private ImageView imageView;
     private TextView textView;
     private Handler mHandler;
     private Integer defaultAnimation;
+    private ImageView promptImageView;
+    private Button firstButton;
+    private Button secondButton;
+    private Timer promptTimer;
+    private Random random;
+    private TimerTask task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +109,22 @@ public class GameActivity extends Activity {
                     case SUCCESS_PLAY:
                         updateAnimation(defaultAnimation);
                         break;
+                    case PROMPT:
+                        pause();
+                        if(msg.arg1 == 0){
+                            String name = "knowledge" + msg.arg2 + ".png";
+                            promptImageView.setVisibility(View.VISIBLE);
+                            promptImageView.setImageResource(getResource(name));
+                        }else if(msg.arg1 == 1){
+                            String name1 =  "question" + msg.arg2 + "a.png";
+                            String name2 = "question" + msg.arg2 + "b.png";
+                            firstButton.setVisibility(View.VISIBLE);
+                            secondButton.setVisibility(View.VISIBLE);
+                            firstButton.setBackgroundResource(getResource(name1));
+                            secondButton.setBackgroundResource(getResource(name2));
+                        }
+
+
                 }
                 return false;
             }
@@ -105,6 +133,12 @@ public class GameActivity extends Activity {
         imageView = (ImageView) findViewById(R.id.game_gif);
         progressBar = (ProgressBar) findViewById(R.id.game_process_bar);
         textView = (TextView) findViewById(R.id.game_process_bubble);
+
+        promptImageView = (ImageView) findViewById(R.id.prompt_image_view);
+        firstButton = (Button) findViewById(R.id.first_choice_btn);
+        secondButton = (Button) findViewById(R.id.second_choice_btn);
+
+        randomQuestion();
 
         defaultAnimation = R.drawable.anim1;
 
@@ -125,6 +159,64 @@ public class GameActivity extends Activity {
         }
     }
 
+
+    private int getResource(String imageName) {
+        Context ctx = getBaseContext();
+        return getResources().getIdentifier(imageName, "drawable", ctx.getPackageName());
+    }
+
+    private void pause(){
+        promptTimer.cancel();
+    }
+
+    private void resume(){
+        promptTimer = new Timer();
+        promptTimer.schedule(task, 5000, 80000 + random.nextInt(20000));
+    }
+
+    private void randomQuestion(){
+        random = new Random();
+
+        task  = new TimerTask() {
+            @Override
+            public void run() {
+                Random random = new Random();
+                mHandler.obtainMessage(PROMPT, random.nextInt(1), random.nextInt(4))
+                        .sendToTarget();
+            }
+        };
+
+        resume();
+
+        firstButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firstButton.setVisibility(View.INVISIBLE);
+                secondButton.setVisibility(View.INVISIBLE);
+
+                updateProgressView(1);
+                resume();
+            }
+        });
+
+        secondButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firstButton.setVisibility(View.INVISIBLE);
+                secondButton.setVisibility(View.INVISIBLE);
+
+                resume();
+            }
+        });
+
+        promptImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setVisibility(View.INVISIBLE);
+                resume();
+            }
+        });
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -156,11 +248,9 @@ public class GameActivity extends Activity {
 
     private class ConnectThread extends Thread{
         private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
 
         private ConnectThread(BluetoothDevice device){
             BluetoothSocket tmp = null;
-            mmDevice = device;
             try{
                 UUID mmUUID = UUID.fromString(mUUID);
                 tmp = device.createRfcommSocketToServiceRecord(mmUUID);
@@ -311,6 +401,8 @@ public class GameActivity extends Activity {
                     for (int i = 0; i < drawable.getFrameCount(); i++) {
                         duration += decoder.getDelay(i);
                     }
+
+                    //switch back
                     mHandler.sendEmptyMessageDelayed(SUCCESS_PLAY, duration * 5);
 
                     return false;
