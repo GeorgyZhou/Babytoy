@@ -14,9 +14,9 @@ public class ResultActivity extends AppCompatActivity {
         ImageView imageView = (ImageView)findViewById(R.id.game_result);
         int state = getIntent().getIntExtra("STATE", -1);
         if(state == 0){
-
+            imageView.setImageResource(R.drawable.game_win);
         }else if(state == 1){
-
+            imageView.setImageResource(R.drawable.game_lose);
         }
     }
 }

@@ -9,23 +9,14 @@
         app:layout_widthPercent="100%"
         app:layout_heightPercent="100%"
         android:id="@+id/menu_background"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        android:src = "@drawable/menu_background"/>
 
     <Button
         app:layout_widthPercent="18%"
         app:layout_heightPercent="8%"
-        app:layout_marginTopPercent="26%"
-        app:layout_marginLeftPercent="70%"
-        android:id="@+id/begin_button"
-        android:text="@string/begin_feed"
-        style="@style/MenuButton"
-        />
-
-    <Button
-        app:layout_widthPercent="18%"
-        app:layout_heightPercent="8%"
-        app:layout_marginTopPercent="46%"
-        app:layout_marginLeftPercent="70%"
+        app:layout_marginTopPercent="80%"
+        app:layout_marginLeftPercent="41%"
         android:id="@+id/continue_button"
         android:text="@string/continue_feed"
         style="@style/MenuButton"
@@ -34,12 +25,22 @@
     <Button
         app:layout_widthPercent="18%"
         app:layout_heightPercent="8%"
-        app:layout_marginTopPercent="66%"
-        app:layout_marginLeftPercent="70%"
+        app:layout_marginTopPercent="80%"
+        app:layout_marginLeftPercent="68.5%"
         android:id="@+id/achievement_button"
         android:text="@string/user_achievement"
         style="@style/MenuButton"
         />
+
+    <Button
+        android:id="@+id/begin_button"
+        style="@style/MenuButton"
+        android:layout_height="126dp"
+        android:text="@string/begin_feed"
+        app:layout_heightPercent="8%"
+        app:layout_marginLeftPercent="13.5%"
+        app:layout_marginTopPercent="80%"
+        app:layout_widthPercent="18%" />
 
 
 </android.support.percent.PercentFrameLayout>

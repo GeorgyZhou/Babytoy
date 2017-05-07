@@ -41,8 +41,8 @@ public class GameActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "GAME_ACTIVITY";
     private static final long TIME_OUT = 5000;
-    private static final String MAC_ADDRESS_1 = "";
-    private static final String MAC_ADDRESS_2 = "";
+    private static final String MAC_ADDRESS_1 = "98:d3:35:70:f1:c2";
+    private static final String MAC_ADDRESS_2 = "98:d3:32:30:be:d7";
     private static final String mUUID = "16fd2706-8baf-433b-82eb-8c7fada847da";
     public static final int MESSAGE_READ = 1;
     public static final int MESSAGE_WRITE = 2;
@@ -52,6 +52,7 @@ public class GameActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter;
     private ProgressBar progressBar;
     private ImageView imageView;
+    private ImageView correctImageView;
     private TextView textView;
     private Handler mHandler;
     private Integer defaultAnimation;
@@ -60,7 +61,6 @@ public class GameActivity extends Activity {
     private Button secondButton;
     private Timer promptTimer;
     private Random random;
-    private TimerTask task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,16 +84,22 @@ public class GameActivity extends Activity {
                         updateProgressView(0);
                         switch(info){
                             case "LA":
+                                Log.i(TAG, "LA Signal Received");
                                 updateAnimation(R.drawable.anim2);
                             case "SA":
+                                Log.i(TAG, "SA Signal Received");
                                 updateAnimation(R.drawable.anim3);
                             case "GA":
+                                Log.i(TAG, "GA Signal Received");
                                 updateAnimation(R.drawable.anim4);
                             case "LB":
+                                Log.i(TAG, "LB Signal Received");
                                 updateAnimation(R.drawable.anim6);
                             case "SB":
+                                Log.i(TAG, "SB Signal Received");
                                 updateAnimation(R.drawable.anim6);
                             case "GB":
+                                Log.i(TAG, "GB Signal Received");
                                 updateAnimation(R.drawable.anim7);
                             default:
                                 if(game_state == 0){
@@ -110,18 +116,52 @@ public class GameActivity extends Activity {
                         updateAnimation(defaultAnimation);
                         break;
                     case PROMPT:
+                        Log.i(TAG, "SENT MESSAGE TO UI---"+msg.arg1 + ":" + msg.arg2);
                         pause();
                         if(msg.arg1 == 0){
-                            String name = "knowledge" + msg.arg2 + ".png";
+                            switch(msg.arg2){
+                                case 0:
+                                    promptImageView.setBackgroundResource(R.drawable.knowledge0);
+                                    break;
+                                case 1:
+                                    promptImageView.setBackgroundResource(R.drawable.knowledge1);
+                                    break;
+                                case 2:
+                                    promptImageView.setBackgroundResource(R.drawable.knowledge2);
+                                    break;
+                                case 3:
+                                    promptImageView.setBackgroundResource(R.drawable.knowledge3);
+                                    break;
+                                case 4:
+                                    promptImageView.setBackgroundResource(R.drawable.knowledge4);
+                                    break;
+                            }
                             promptImageView.setVisibility(View.VISIBLE);
-                            promptImageView.setImageResource(getResource(name));
                         }else if(msg.arg1 == 1){
-                            String name1 =  "question" + msg.arg2 + "a.png";
-                            String name2 = "question" + msg.arg2 + "b.png";
+                            switch(msg.arg2){
+                                case 0:
+                                    firstButton.setBackgroundResource(R.drawable.question1a);
+                                    secondButton.setBackgroundResource(R.drawable.question1b);
+                                    break;
+                                case 1:
+                                    firstButton.setBackgroundResource(R.drawable.question2a);
+                                    secondButton.setBackgroundResource(R.drawable.question2b);
+                                    break;
+                                case 2:
+                                    firstButton.setBackgroundResource(R.drawable.question3a);
+                                    secondButton.setBackgroundResource(R.drawable.question3b);
+                                    break;
+                                case 3:
+                                    firstButton.setBackgroundResource(R.drawable.question4a);
+                                    secondButton.setBackgroundResource(R.drawable.question4b);
+                                    break;
+                                case 4:
+                                    firstButton.setBackgroundResource(R.drawable.question5a);
+                                    secondButton.setBackgroundResource(R.drawable.question5b);
+                                    break;
+                            }
                             firstButton.setVisibility(View.VISIBLE);
                             secondButton.setVisibility(View.VISIBLE);
-                            firstButton.setBackgroundResource(getResource(name1));
-                            secondButton.setBackgroundResource(getResource(name2));
                         }
 
 
@@ -134,6 +174,7 @@ public class GameActivity extends Activity {
         progressBar = (ProgressBar) findViewById(R.id.game_process_bar);
         textView = (TextView) findViewById(R.id.game_process_bubble);
 
+        correctImageView = (ImageView) findViewById(R.id.correct_image_view);
         promptImageView = (ImageView) findViewById(R.id.prompt_image_view);
         firstButton = (Button) findViewById(R.id.first_choice_btn);
         secondButton = (Button) findViewById(R.id.second_choice_btn);
@@ -167,24 +208,23 @@ public class GameActivity extends Activity {
 
     private void pause(){
         promptTimer.cancel();
+        promptTimer.purge();
     }
 
     private void resume(){
-        promptTimer = new Timer();
-        promptTimer.schedule(task, 5000, 80000 + random.nextInt(20000));
+        promptTimer = new Timer(true);
+        promptTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Random random = new Random();
+                mHandler.obtainMessage(PROMPT, random.nextInt(2), random.nextInt(5))
+                        .sendToTarget();
+            }
+        }, 6000 + random.nextInt(2000));
     }
 
     private void randomQuestion(){
         random = new Random();
-
-        task  = new TimerTask() {
-            @Override
-            public void run() {
-                Random random = new Random();
-                mHandler.obtainMessage(PROMPT, random.nextInt(1), random.nextInt(4))
-                        .sendToTarget();
-            }
-        };
 
         resume();
 
@@ -193,9 +233,8 @@ public class GameActivity extends Activity {
             public void onClick(View v) {
                 firstButton.setVisibility(View.INVISIBLE);
                 secondButton.setVisibility(View.INVISIBLE);
-
+                correctImageView.setVisibility(View.VISIBLE);
                 updateProgressView(1);
-                resume();
             }
         });
 
@@ -213,6 +252,14 @@ public class GameActivity extends Activity {
             @Override
             public void onClick(View v) {
                 v.setVisibility(View.INVISIBLE);
+                resume();
+            }
+        });
+
+        correctImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                correctImageView.setVisibility(View.INVISIBLE);
                 resume();
             }
         });

@@ -29,9 +29,6 @@ public class MenuActivity extends Activity implements View.OnClickListener{
         beginButton.setOnClickListener(this);
         continueButton.setOnClickListener(this);
         achievementButton.setOnClickListener(this);
-
-        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
-        Glide.with(this).load(R.drawable.anim1).into(imageViewTarget);
     }
 
     @Override
@@ -42,8 +39,7 @@ public class MenuActivity extends Activity implements View.OnClickListener{
             startActivity(intent);
         }
         else if(v.getId() == R.id.achievement_button){
-            Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra("STATE", CONTINUE_GAME);
+            Intent intent = new Intent(this, AchievementActivity.class);
             startActivity(intent);
         }
         else if(v.getId() == R.id.continue_button){

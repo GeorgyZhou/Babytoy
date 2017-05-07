@@ -11,6 +11,13 @@
         android:id="@+id/game_gif"
         android:visibility="visible"/>
 
+    <ImageView
+        app:layout_widthPercent="100%"
+        app:layout_heightPercent="100%"
+        android:id="@+id/correct_image_view"
+        android:visibility="invisible"
+        android:background="@drawable/q_correct"/>
+
     <ProgressBar
         android:id="@+id/game_process_bar"
         style="@style/mProgress_horizontal"
@@ -29,40 +36,35 @@
         android:background="@drawable/progress_bubble"
         android:text="@string/begin_progress_text"/>
 
-    <LinearLayout
-        android:id="@+id/board_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+
+    <ImageView
+        android:id="@+id/prompt_image_view"
+        app:layout_widthPercent="70%"
+        app:layout_heightPercent="25%"
         app:layout_marginTopPercent="10%"
-        app:layout_marginLeftPercent="10%"
-        android:orientation="vertical">
+        app:layout_marginLeftPercent="15%"
+        android:background="@drawable/knowledge0"
+        android:visibility="invisible"/>
 
-        <ImageView
-            android:id="@+id/prompt_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"/>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    <Button
+        app:layout_widthPercent = "35%"
+        app:layout_heightPercent = "25%"
+        app:layout_marginTopPercent="10%"
+        app:layout_marginLeftPercent="15%"
+        android:id = "@+id/first_choice_btn"
+        android:background="@drawable/question1a"
+        android:visibility="invisible"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id = "@+id/first_choice_btn"
-                android:visibility="invisible"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id= "@+id/second_choice_btn"
-                android:visibility="invisible"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    <Button
+        app:layout_widthPercent = "35%"
+        app:layout_heightPercent = "25%"
+        app:layout_marginTopPercent="10%"
+        app:layout_marginLeftPercent="50%"
+        android:id = "@+id/second_choice_btn"
+        android:background="@drawable/question1b"
+        android:visibility="invisible"/>
 
 
 </android.support.percent.PercentFrameLayout>
