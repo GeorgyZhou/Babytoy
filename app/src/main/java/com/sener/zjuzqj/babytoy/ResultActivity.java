@@ -1,10 +1,11 @@
 package com.sener.zjuzqj.babytoy;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 
-public class ResultActivity extends AppCompatActivity {
+public class ResultActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -200,12 +200,6 @@ public class GameActivity extends Activity {
         }
     }
 
-
-    private int getResource(String imageName) {
-        Context ctx = getBaseContext();
-        return getResources().getIdentifier(imageName, "drawable", ctx.getPackageName());
-    }
-
     private void pause(){
         promptTimer.cancel();
         promptTimer.purge();
@@ -234,6 +228,8 @@ public class GameActivity extends Activity {
                 firstButton.setVisibility(View.INVISIBLE);
                 secondButton.setVisibility(View.INVISIBLE);
                 correctImageView.setVisibility(View.VISIBLE);
+                //updateAnimation(R.drawable.anim2);
+
                 updateProgressView(1);
             }
         });
@@ -243,7 +239,6 @@ public class GameActivity extends Activity {
             public void onClick(View v) {
                 firstButton.setVisibility(View.INVISIBLE);
                 secondButton.setVisibility(View.INVISIBLE);
-
                 resume();
             }
         });
@@ -353,7 +348,7 @@ public class GameActivity extends Activity {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, "[STREAM GET FAILED]: " + e.getMessage());
             }
 
             mmInStream = tmpIn;
@@ -374,6 +369,7 @@ public class GameActivity extends Activity {
                     mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
                 } catch (IOException e) {
+                    Log.e(TAG, "[READ FAILED]: " + e.getMessage());
                     break;
                 }
             }
@@ -403,6 +399,8 @@ public class GameActivity extends Activity {
         switch(type){
             case 1:
                 state_progress += 10;
+
+                Log.i(TAG, "state: " + game_state);
                 break;
             case 0:
                 state_progress += 2;
@@ -410,6 +408,7 @@ public class GameActivity extends Activity {
         }
         if(state_progress >= 100){
             game_state++;
+            Log.i(TAG, "state: " + game_state);
             if(game_state == 2){
                 Intent intent = new Intent(this, ResultActivity.class);
                 intent.putExtra("STATE", 0);
@@ -417,6 +416,7 @@ public class GameActivity extends Activity {
             }else if(game_state == 1){
                 state_progress = 0;
                 defaultAnimation = R.drawable.anim5;
+                updateAnimation(defaultAnimation);
             }
         }
 
@@ -424,6 +424,8 @@ public class GameActivity extends Activity {
         PercentFrameLayout.LayoutParams params =(PercentFrameLayout.LayoutParams) textView.getLayoutParams();
         PercentLayoutHelper.PercentLayoutInfo layoutInfo = params.getPercentLayoutInfo();
         layoutInfo.leftMarginPercent= (float)(0.68 + state_progress / 100.0 * 0.2);
+        String textString = Integer.toString(state_progress);
+        textView.setText(textString);
         textView.requestLayout();
 
         // update progress bar

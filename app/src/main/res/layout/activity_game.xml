@@ -25,7 +25,7 @@
         app:layout_heightPercent="3%"
         app:layout_marginTopPercent="90%"
         app:layout_marginLeftPercent="70%"
-        android:progress="21" />
+        android:progress="0" />
 
     <TextView
         android:id="@+id/game_process_bubble"
@@ -33,6 +33,9 @@
         app:layout_heightPercent="5%"
         app:layout_marginTopPercent="84%"
         app:layout_marginLeftPercent="68%"
+        android:textSize="25sp"
+        android:textColor="@color/black_overlay"
+        android:gravity="center"
         android:background="@drawable/progress_bubble"
         android:text="@string/begin_progress_text"/>
 

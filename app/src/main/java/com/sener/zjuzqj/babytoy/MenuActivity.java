@@ -12,8 +12,8 @@ import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 public class MenuActivity extends Activity implements View.OnClickListener{
 
-    public static final int NEW_GAME = 1;
-    public static final int CONTINUE_GAME = 2;
+    public static final int NEW_GAME = 0;
+    public static final int CONTINUE_GAME = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
