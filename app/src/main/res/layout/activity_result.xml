@@ -9,7 +9,8 @@
         app:layout_widthPercent="100%"
         app:layout_heightPercent="100%"
         android:id="@+id/game_result"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        android:scaleType="centerCrop"/>
 
 
 </android.support.percent.PercentFrameLayout>

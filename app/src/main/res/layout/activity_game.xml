@@ -9,14 +9,16 @@
         app:layout_widthPercent="100%"
         app:layout_heightPercent="100%"
         android:id="@+id/game_gif"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        android:scaleType="centerCrop"/>
 
     <ImageView
         app:layout_widthPercent="100%"
         app:layout_heightPercent="100%"
         android:id="@+id/correct_image_view"
         android:visibility="invisible"
-        android:background="@drawable/q_correct"/>
+        android:background="@drawable/q_correct"
+        android:scaleType="centerCrop"/>
 
     <ProgressBar
         android:id="@+id/game_process_bar"
@@ -43,16 +45,17 @@
     <ImageView
         android:id="@+id/prompt_image_view"
         app:layout_widthPercent="70%"
-        app:layout_heightPercent="25%"
+        app:layout_heightPercent="22%"
         app:layout_marginTopPercent="10%"
         app:layout_marginLeftPercent="15%"
         android:background="@drawable/knowledge0"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+        android:scaleType="centerCrop"/>
 
 
     <Button
         app:layout_widthPercent = "35%"
-        app:layout_heightPercent = "25%"
+        app:layout_heightPercent = "22%"
         app:layout_marginTopPercent="10%"
         app:layout_marginLeftPercent="15%"
         android:id = "@+id/first_choice_btn"
@@ -62,7 +65,7 @@
 
     <Button
         app:layout_widthPercent = "35%"
-        app:layout_heightPercent = "25%"
+        app:layout_heightPercent = "22%"
         app:layout_marginTopPercent="10%"
         app:layout_marginLeftPercent="50%"
         android:id = "@+id/second_choice_btn"

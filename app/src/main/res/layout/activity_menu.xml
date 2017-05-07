@@ -10,7 +10,8 @@
         app:layout_heightPercent="100%"
         android:id="@+id/menu_background"
         android:visibility="visible"
-        android:src = "@drawable/menu_background"/>
+        android:src = "@drawable/menu_background"
+        android:scaleType="centerCrop"/>
 
     <Button
         app:layout_widthPercent="18%"

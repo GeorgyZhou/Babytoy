@@ -10,7 +10,8 @@
         app:layout_heightPercent="100%"
         android:id="@+id/achivement_background"
         android:visibility="visible"
-        android:src = "@drawable/achievement"/>
+        android:src = "@drawable/achievement"
+        android:scaleType="centerCrop"/>
 
 
 </android.support.percent.PercentFrameLayout>
