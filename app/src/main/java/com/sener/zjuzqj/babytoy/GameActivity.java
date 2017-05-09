@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.gifdecoder.GifDecoder;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
@@ -29,9 +31,6 @@ import com.bumptech.glide.request.target.Target;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
@@ -67,14 +66,27 @@ public class GameActivity extends Activity {
     private Button secondButton;
     private Timer promptTimer;
     private Random random;
+    private SharedPreferences sharedPreferences;
+    private int questionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
 
-        game_state = getIntent().getIntExtra("STATE", 0);
-        state_progress = getIntent().getIntExtra("PROGRESS", 0);
+        int tmp = getIntent().getIntExtra("CHOICE", 0);
+        switch(tmp){
+            case MenuActivity.NEW_GAME:
+                game_state = 0;
+                state_progress = 0;
+                break;
+            case MenuActivity.CONTINUE_GAME:
+                game_state = sharedPreferences.getInt("GAME_STATE", 0);
+                state_progress = sharedPreferences.getInt("STATE_PROGRESS", 0);
+                Log.i(TAG, "[Data Read]: game_state: " + game_state + "; state_progress: "+ state_progress);
+                break;
+        }
 
         mHandler = new Handler(new Handler.Callback() {
 
@@ -131,11 +143,8 @@ public class GameActivity extends Activity {
                                 }
                                 break;
                             default:
-                                if(game_state == 0){
-
-                                } else if(game_state == 1){
-
-                                }
+                                Log.i(TAG, "[Invalid Signal]: " + info);
+                                break;
                         }
                         break;
                     case MESSAGE_WRITE:
@@ -189,6 +198,7 @@ public class GameActivity extends Activity {
                                     secondButton.setBackgroundResource(R.drawable.question5b);
                                     break;
                             }
+                            questionId = msg.arg2;
                             firstButton.setVisibility(View.VISIBLE);
                             secondButton.setVisibility(View.VISIBLE);
                         }
@@ -210,9 +220,14 @@ public class GameActivity extends Activity {
 
         randomQuestion();
 
-        defaultAnimation = R.drawable.anim1;
-
+        if(game_state == 0){
+            defaultAnimation = R.drawable.anim1;
+        }
+        else if(game_state == 1) {
+            defaultAnimation = R.drawable.anim5;
+        }
         updateAnimation(defaultAnimation);
+        updateProgressView(3);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter == null){
@@ -227,6 +242,18 @@ public class GameActivity extends Activity {
                 connectToDevice();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        if (mConnectedThread != null)
+            mConnectThread.cancel();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("GAME_STATE", game_state);
+        editor.putInt("STATE_PROGRESS", state_progress);
+        Log.i(TAG, "[Data Saved]: game_state: " + game_state + "; state progress: " + state_progress);
+        editor.apply();
     }
 
     private void pause(){
@@ -256,10 +283,34 @@ public class GameActivity extends Activity {
             public void onClick(View v) {
                 firstButton.setVisibility(View.INVISIBLE);
                 secondButton.setVisibility(View.INVISIBLE);
-                correctImageView.setVisibility(View.VISIBLE);
-                //updateAnimation(R.drawable.anim2);
 
-                updateProgressView(1);
+                switch(questionId){
+                    case 0:
+                        correctImageView.setBackgroundResource(R.drawable.q1_wrong);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        resume();
+                        break;
+                    case 1:
+                        correctImageView.setBackgroundResource(R.drawable.q2_wrong);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        resume();
+                        break;
+                    case 2:
+                        correctImageView.setBackgroundResource(R.drawable.q3_wrong);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        resume();
+                        break;
+                    case 3:
+                        correctImageView.setBackgroundResource(R.drawable.q_correct);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        updateProgressView(1);
+                        break;
+                    case 4:
+                        correctImageView.setBackgroundResource(R.drawable.q_correct);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        updateProgressView(1);
+                        break;
+                }
             }
         });
 
@@ -268,7 +319,33 @@ public class GameActivity extends Activity {
             public void onClick(View v) {
                 firstButton.setVisibility(View.INVISIBLE);
                 secondButton.setVisibility(View.INVISIBLE);
-                resume();
+                switch(questionId){
+                    case 0:
+                        correctImageView.setBackgroundResource(R.drawable.q_correct);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        updateProgressView(1);
+                        break;
+                    case 1:
+                        correctImageView.setBackgroundResource(R.drawable.q_correct);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        updateProgressView(1);
+                        break;
+                    case 2:
+                        correctImageView.setBackgroundResource(R.drawable.q_correct);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        updateProgressView(1);
+                        break;
+                    case 3:
+                        correctImageView.setBackgroundResource(R.drawable.q4_wrong);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        resume();
+                        break;
+                    case 4:
+                        correctImageView.setBackgroundResource(R.drawable.q5_wrong);
+                        correctImageView.setVisibility(View.VISIBLE);
+                        resume();
+                        break;
+                }
             }
         });
 
@@ -305,7 +382,6 @@ public class GameActivity extends Activity {
     }
 
     private void connectToDevice(){
-        List<String> devices = new ArrayList<String>();
         Set<BluetoothDevice> bondedDevices = mBluetoothAdapter.getBondedDevices();
         int flag = 0;
         for (BluetoothDevice device : bondedDevices) {
@@ -442,29 +518,36 @@ public class GameActivity extends Activity {
     private void updateProgressView(int type){
         switch(type){
             case 1:
-                state_progress += 10;
+                state_progress += 50;
 
                 Log.i(TAG, "state: " + game_state);
                 break;
             case 0:
                 state_progress += 2;
                 break;
+            case 3:
+                Log.i(TAG, "[Load View from Storage]");
+                break;
         }
         if(state_progress >= 100){
             game_state++;
+            state_progress = 0;
             Log.i(TAG, "state: " + game_state);
             if(game_state == 2){
+                game_state = 0;
                 Intent intent = new Intent(this, ResultActivity.class);
                 intent.putExtra("STATE", 0);
                 startActivity(intent);
             }else if(game_state == 1){
-                connectToDevice();
-                state_progress = 0;
+                if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())
+                    connectToDevice();
                 defaultAnimation = R.drawable.anim5;
                 updateAnimation(defaultAnimation);
 
             }
         }
+
+        Log.i(TAG, "STATE PROGRESS: " + state_progress);
 
         // Update TextView Location
         PercentFrameLayout.LayoutParams params =(PercentFrameLayout.LayoutParams) textView.getLayoutParams();
@@ -479,7 +562,7 @@ public class GameActivity extends Activity {
     }
 
     private void updateAnimation(Integer resId){
-        if(resId != R.drawable.anim1 && resId != R.drawable.anim4) {
+        if(resId != R.drawable.anim1 && resId != R.drawable.anim5) {
 
             Glide.with(this).load(resId).listener(new RequestListener<Integer, GlideDrawable>() {
                 @Override
@@ -502,9 +585,9 @@ public class GameActivity extends Activity {
 
                     return false;
                 }
-            }).into(new GlideDrawableImageViewTarget(imageView, 5));
+            }).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView, 5));
         }else{
-            Glide.with(this).load(resId).into(new GlideDrawableImageViewTarget(imageView));
+             Glide.with(this).load(resId).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView));
         }
     }
 }

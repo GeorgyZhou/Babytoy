@@ -7,9 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-
 public class MenuActivity extends Activity implements View.OnClickListener{
 
     public static final int NEW_GAME = 0;
@@ -35,7 +32,7 @@ public class MenuActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         if(v.getId() == R.id.begin_button){
             Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra("STATE", NEW_GAME);
+            intent.putExtra("CHOICE", NEW_GAME);
             startActivity(intent);
         }
         else if(v.getId() == R.id.achievement_button){
@@ -43,7 +40,9 @@ public class MenuActivity extends Activity implements View.OnClickListener{
             startActivity(intent);
         }
         else if(v.getId() == R.id.continue_button){
-
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("CHOICE", CONTINUE_GAME);
+            startActivity(intent);
         }
     }
 }
