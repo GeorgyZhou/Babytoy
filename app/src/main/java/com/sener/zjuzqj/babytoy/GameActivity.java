@@ -29,7 +29,10 @@ import com.bumptech.glide.request.target.Target;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -41,15 +44,17 @@ public class GameActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "GAME_ACTIVITY";
     private static final long TIME_OUT = 5000;
-    private static final String MAC_ADDRESS_1 = "98:d3:35:70:f1:c2";
-    private static final String MAC_ADDRESS_2 = "98:d3:32:30:be:d7";
-    private static final String mUUID = "16fd2706-8baf-433b-82eb-8c7fada847da";
+    private static final String MAC_ADDRESS_1 = "98:D3:35:70:F1:C2";
+    private static final String MAC_ADDRESS_2 = "98:D3:32:30:BE:D7";
+    private static final String mUUID = "00001101-0000-1000-8000-00805F9B34FB";
     public static final int MESSAGE_READ = 1;
     public static final int MESSAGE_WRITE = 2;
     public static final int CONNECT_FINISH = 0;
     public static final int SUCCESS_PLAY = 3;
     public static final int PROMPT = 4;
     private BluetoothAdapter mBluetoothAdapter;
+    private ConnectThread mConnectThread = null;
+    private ConnectedThread mConnectedThread = null;
     private ProgressBar progressBar;
     private ImageView imageView;
     private ImageView correctImageView;
@@ -79,7 +84,7 @@ public class GameActivity extends Activity {
                         communicateWithDevice((BluetoothSocket)msg.obj);
                         break;
                     case MESSAGE_READ:
-                        String info = new String((byte[])msg.obj);
+                        String info = (String)msg.obj;
 
                         updateProgressView(0);
                         switch(info){
@@ -271,20 +276,26 @@ public class GameActivity extends Activity {
     }
 
     private void communicateWithDevice(BluetoothSocket mSocket){
-        CommunicationThread communicationThread = new CommunicationThread(mSocket);
+        ConnectedThread communicationThread = new ConnectedThread(mSocket);
         communicationThread.start();
     }
 
     private void connectToDevice(){
-        BluetoothDevice device;
-        if ( 0 <= game_state && game_state <= 3) {
-            device = mBluetoothAdapter.getRemoteDevice(MAC_ADDRESS_1);
+        List<String> devices = new ArrayList<String>();
+        Set<BluetoothDevice> bondedDevices = mBluetoothAdapter.getBondedDevices();
+        int flag = 0;
+        for (BluetoothDevice device : bondedDevices) {
+            Log.i(TAG, "[DEVICE ADDRESS]: " + device.getAddress());
+            if (device.getAddress().equals(MAC_ADDRESS_1)) {
+                mConnectThread = new ConnectThread(device);
+                mConnectThread.start();
+                flag = 1;
+                break;
+            }
         }
-        else{
-            device = mBluetoothAdapter.getRemoteDevice(MAC_ADDRESS_2);
+        if(flag == 0){
+            Log.e(TAG, "Fail to Connect: [NO DEVICE WITH MAC ADDRESS FOUND]!!");
         }
-        ConnectThread connectThread = new ConnectThread(device);
-        connectThread.start();
     }
 
 
@@ -309,6 +320,8 @@ public class GameActivity extends Activity {
 
             try{
                 mmSocket.connect();
+                mConnectedThread = new ConnectedThread(mmSocket);
+                mConnectedThread.start();
             } catch(IOException e){
                 Log.e(TAG, "Fail to connect: " + e.getMessage());
                 try{
@@ -332,12 +345,12 @@ public class GameActivity extends Activity {
         }
     }
 
-    private class CommunicationThread extends Thread {
+    private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
-        private CommunicationThread(BluetoothSocket socket) {
+        private ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -360,13 +373,16 @@ public class GameActivity extends Activity {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
+            Log.i(TAG, "Connection Established");
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
+                    String str = new String(buffer);
+                    str = str.substring(0, bytes);
                     // Send the obtained bytes to the UI activity
-                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, str)
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "[READ FAILED]: " + e.getMessage());
