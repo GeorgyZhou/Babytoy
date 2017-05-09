@@ -88,43 +88,43 @@ public class GameActivity extends Activity {
                         String info = (String)msg.obj;
                         switch(info){
 
-                            case "LA":
-                                Log.i(TAG, "LA Signal Received");
+                            case "C":
+                                Log.i(TAG, "C Signal Received");
                                 if (game_state == 0) {
                                     updateAnimation(R.drawable.anim2);
                                     updateProgressView(0);
                                 }
                                 break;
-                            case "SA":
-                                Log.i(TAG, "SA Signal Received");
+                            case "D":
+                                Log.i(TAG, "D Signal Received");
                                 if (game_state == 0) {
                                     updateAnimation(R.drawable.anim3);
                                     updateProgressView(0);
                                 }
                                 break;
-                            case "GA":
-                                Log.i(TAG, "GA Signal Received");
+                            case "E":
+                                Log.i(TAG, "E Signal Received");
                                 if (game_state == 0) {
                                     updateAnimation(R.drawable.anim4);
                                     updateProgressView(0);
                                 }
                                 break;
-                            case "LB":
-                                Log.i(TAG, "LB Signal Received");
+                            case "F":
+                                Log.i(TAG, "F Signal Received");
                                 if(game_state == 1) {
                                     updateAnimation(R.drawable.anim6);
                                     updateProgressView(0);
                                 }
                                 break;
-                            case "SB":
-                                Log.i(TAG, "SB Signal Received");
+                            case "G":
+                                Log.i(TAG, "G Signal Received");
                                 if (game_state == 1) {
                                     updateProgressView(0);
                                     updateAnimation(R.drawable.anim6);
                                 }
                                 break;
-                            case "GB":
-                                Log.i(TAG, "GB Signal Received");
+                            case "H":
+                                Log.i(TAG, "H Signal Received");
                                 if (game_state == 1){
                                     updateAnimation(R.drawable.anim7);
                                     updateProgressView(0);
