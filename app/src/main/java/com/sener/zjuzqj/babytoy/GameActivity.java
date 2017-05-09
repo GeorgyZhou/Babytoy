@@ -366,11 +366,7 @@ public class GameActivity extends Activity {
                 } catch(IOException closeException){
                     Log.e(TAG, "Fail to close socket: " + e.getMessage());
                 }
-                return;
             }
-
-            mHandler.obtainMessage(CONNECT_FINISH, mmSocket)
-                    .sendToTarget();
         }
 
         public void cancel(){
@@ -410,7 +406,10 @@ public class GameActivity extends Activity {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
-            Log.i(TAG, "Connection Established");
+            if(mmSocket.isConnected())
+                Log.i(TAG, "Connection Established");
+            else
+                Log.e(TAG, "Socket is not established");
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
