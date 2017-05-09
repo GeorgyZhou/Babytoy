@@ -376,7 +376,6 @@ public class GameActivity extends Activity {
         public void cancel(){
             try{
                 mmSocket.close();
-                mConnectedThread.cancel();
             } catch(IOException e){
                 Log.e(TAG, "Fail to close socket: " + e.getMessage());
             }
@@ -434,16 +433,6 @@ public class GameActivity extends Activity {
         public void write(byte[] bytes) {
             try {
                 mmOutStream.write(bytes);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-            }
-        }
-
-        /* Call this from the main activity to shutdown the connection */
-        public void cancel() {
-            try {
-                if(mmSocket.isConnected())
-                    mmSocket.close();
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
             }
