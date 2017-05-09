@@ -29,6 +29,7 @@ import com.bumptech.glide.request.target.Target;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -286,7 +287,14 @@ public class GameActivity extends Activity {
         int flag = 0;
         for (BluetoothDevice device : bondedDevices) {
             Log.i(TAG, "[DEVICE ADDRESS]: " + device.getAddress());
-            if (device.getAddress().equals(MAC_ADDRESS_1)) {
+            if ( game_state == 0 && device.getAddress().equals(MAC_ADDRESS_1)) {
+                mConnectThread = new ConnectThread(device);
+                mConnectThread.start();
+                flag = 1;
+                break;
+            }
+            else if( game_state == 1 && device.getAddress().equals(MAC_ADDRESS_2)){
+                mConnectThread.cancel();
                 mConnectThread = new ConnectThread(device);
                 mConnectThread.start();
                 flag = 1;
@@ -322,6 +330,10 @@ public class GameActivity extends Activity {
                 mmSocket.connect();
                 mConnectedThread = new ConnectedThread(mmSocket);
                 mConnectedThread.start();
+                if(game_state == 0)
+                    mConnectedThread.write("A".getBytes("US-ASCII"));
+                else if(game_state == 1)
+                    mConnectedThread.write("B".getBytes("US-ASCII"));
             } catch(IOException e){
                 Log.e(TAG, "Fail to connect: " + e.getMessage());
                 try{
@@ -339,6 +351,7 @@ public class GameActivity extends Activity {
         public void cancel(){
             try{
                 mmSocket.close();
+                mConnectedThread.cancel();
             } catch(IOException e){
                 Log.e(TAG, "Fail to close socket: " + e.getMessage());
             }
@@ -381,6 +394,7 @@ public class GameActivity extends Activity {
                     bytes = mmInStream.read(buffer);
                     String str = new String(buffer);
                     str = str.substring(0, bytes);
+                    Log.i(TAG, "[MESSAGE RECEIVED]: " + str);
                     // Send the obtained bytes to the UI activity
                     mHandler.obtainMessage(MESSAGE_READ, bytes, -1, str)
                             .sendToTarget();
@@ -403,7 +417,8 @@ public class GameActivity extends Activity {
         /* Call this from the main activity to shutdown the connection */
         public void cancel() {
             try {
-                mmSocket.close();
+                if(mmSocket.isConnected())
+                    mmSocket.close();
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
             }
@@ -430,9 +445,11 @@ public class GameActivity extends Activity {
                 intent.putExtra("STATE", 0);
                 startActivity(intent);
             }else if(game_state == 1){
+                connectToDevice();
                 state_progress = 0;
                 defaultAnimation = R.drawable.anim5;
                 updateAnimation(defaultAnimation);
+
             }
         }
 
