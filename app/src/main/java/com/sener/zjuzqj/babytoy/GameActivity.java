@@ -45,8 +45,8 @@ public class GameActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "GAME_ACTIVITY";
     private static final long TIME_OUT = 5000;
-    private static final String MAC_ADDRESS_2 = "98:D3:31:FD:48:F8";
-    private static final String MAC_ADDRESS_1 = "98:D3:32:30:BE:D7";
+    private static final String MAC_ADDRESS_1 = "98:D3:35:70:F1:C2";
+    private static final String MAC_ADDRESS_2 = "98:D3:32:30:BE:D7";
     private static final String mUUID = "00001101-0000-1000-8000-00805F9B34FB";
     public static final int MESSAGE_READ = 1;
     public static final int MESSAGE_WRITE = 2;
@@ -94,36 +94,42 @@ public class GameActivity extends Activity {
                                     updateAnimation(R.drawable.anim2);
                                     updateProgressView(0);
                                 }
+                                break;
                             case "SA":
                                 Log.i(TAG, "SA Signal Received");
                                 if (game_state == 0) {
                                     updateAnimation(R.drawable.anim3);
                                     updateProgressView(0);
                                 }
+                                break;
                             case "GA":
                                 Log.i(TAG, "GA Signal Received");
                                 if (game_state == 0) {
                                     updateAnimation(R.drawable.anim4);
                                     updateProgressView(0);
                                 }
+                                break;
                             case "LB":
                                 Log.i(TAG, "LB Signal Received");
                                 if(game_state == 1) {
                                     updateAnimation(R.drawable.anim6);
                                     updateProgressView(0);
                                 }
+                                break;
                             case "SB":
                                 Log.i(TAG, "SB Signal Received");
                                 if (game_state == 1) {
                                     updateProgressView(0);
                                     updateAnimation(R.drawable.anim6);
                                 }
+                                break;
                             case "GB":
                                 Log.i(TAG, "GB Signal Received");
                                 if (game_state == 1){
                                     updateAnimation(R.drawable.anim7);
                                     updateProgressView(0);
                                 }
+                                break;
                             default:
                                 if(game_state == 0){
 
