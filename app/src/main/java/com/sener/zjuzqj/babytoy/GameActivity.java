@@ -45,8 +45,8 @@ public class GameActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "GAME_ACTIVITY";
     private static final long TIME_OUT = 5000;
-    private static final String MAC_ADDRESS_1 = "98:D3:31:FD:48:F8";
-    private static final String MAC_ADDRESS_2 = "98:D3:32:30:BE:D7";
+    private static final String MAC_ADDRESS_2 = "98:D3:31:FD:48:F8";
+    private static final String MAC_ADDRESS_1 = "98:D3:32:30:BE:D7";
     private static final String mUUID = "00001101-0000-1000-8000-00805F9B34FB";
     public static final int MESSAGE_READ = 1;
     public static final int MESSAGE_WRITE = 2;
@@ -348,9 +348,11 @@ public class GameActivity extends Activity {
                 mConnectedThread = new ConnectedThread(mmSocket);
                 mConnectedThread.start();
                 if(game_state == 0)
-                    mConnectedThread.write("A".getBytes("US-ASCII"));
+                    for (int i = 0; i < 5; i++)
+                        mConnectedThread.write("A".getBytes("US-ASCII"));
                 else if(game_state == 1)
-                    mConnectedThread.write("B".getBytes("US-ASCII"));
+                    for (int i = 0; i < 5; i++)
+                        mConnectedThread.write("B".getBytes("US-ASCII"));
             } catch(IOException e){
                 Log.e(TAG, "Fail to connect: " + e.getMessage());
                 try{
