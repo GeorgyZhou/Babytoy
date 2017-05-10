@@ -393,7 +393,8 @@ public class GameActivity extends Activity {
                 break;
             }
             else if( game_state == 1 && device.getAddress().equals(MAC_ADDRESS_2)){
-                mConnectThread.cancel();
+                if(mConnectThread != null)
+                    mConnectThread.cancel();
                 mConnectThread = new ConnectThread(device);
                 mConnectThread.start();
                 flag = 1;
