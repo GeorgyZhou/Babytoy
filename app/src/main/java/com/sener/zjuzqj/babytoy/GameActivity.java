@@ -45,7 +45,7 @@ public class GameActivity extends Activity {
     private static final String TAG = "GAME_ACTIVITY";
     private static final long TIME_OUT = 5000;
     private static final String MAC_ADDRESS_1 = "98:D3:35:70:F1:C2";
-    private static final String MAC_ADDRESS_2 = "98:D3:32:30:BE:D7";
+    private static final String MAC_ADDRESS_2 = "20:16:05:09:26:10";
     private static final String mUUID = "00001101-0000-1000-8000-00805F9B34FB";
     public static final int MESSAGE_READ = 1;
     public static final int MESSAGE_WRITE = 2;
