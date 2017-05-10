@@ -21,24 +21,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.gifdecoder.GifDecoder;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.load.resource.gif.GifDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.bumptech.glide.request.target.Target;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Timestamp;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import pl.droidsonroids.gif.AnimationListener;
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+import pl.droidsonroids.gif.MultiCallback;
 
 public class GameActivity extends Activity {
 
@@ -59,11 +55,11 @@ public class GameActivity extends Activity {
     private ConnectThread mConnectThread = null;
     private ConnectedThread mConnectedThread = null;
     private ProgressBar progressBar;
-    private ImageView imageView;
+    private GifImageView gifImageView;
     private ImageView correctImageView;
     private TextView textView;
     private Handler mHandler;
-    private Integer defaultAnimation;
+    private GifDrawable defaultAnimation;
     private ImageView promptImageView;
     private Button firstButton;
     private Button secondButton;
@@ -71,7 +67,13 @@ public class GameActivity extends Activity {
     private Random random;
     private long lastTimeStamp = -1;
     private String signalInfo = null;
-
+    private GifDrawable mDrawable1;
+    private GifDrawable mDrawable2;
+    private GifDrawable mDrawable3;
+    private GifDrawable mDrawable4;
+    private GifDrawable mDrawable5;
+    private GifDrawable mDrawable6;
+    private GifDrawable mDrawable7;
     private SharedPreferences sharedPreferences;
     private int questionId;
 
@@ -111,27 +113,27 @@ public class GameActivity extends Activity {
                         }else {
                             switch (info) {
                                 case "C":
-                                    updateAnimation(R.drawable.anim2);
+                                    updateAnimation(mDrawable2);
                                     updateProgressView(0);
                                     break;
                                 case "D":
                                     Log.i(TAG, "D Signal Received");
                                     if (game_state == 0) {
-                                        updateAnimation(R.drawable.anim3);
+                                        updateAnimation(mDrawable3);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "E":
                                     Log.i(TAG, "E Signal Received");
                                     if (game_state == 0) {
-                                        updateAnimation(R.drawable.anim4);
+                                        updateAnimation(mDrawable4);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "F":
                                     Log.i(TAG, "F Signal Received");
                                     if (game_state == 1) {
-                                        updateAnimation(R.drawable.anim6);
+                                        updateAnimation(mDrawable6);
                                         updateProgressView(0);
                                     }
                                     break;
@@ -139,13 +141,13 @@ public class GameActivity extends Activity {
                                     Log.i(TAG, "G Signal Received");
                                     if (game_state == 1) {
                                         updateProgressView(0);
-                                        updateAnimation(R.drawable.anim6);
+                                        updateAnimation(mDrawable6);
                                     }
                                     break;
                                 case "H":
                                     Log.i(TAG, "H Signal Received");
                                     if (game_state == 1) {
-                                        updateAnimation(R.drawable.anim7);
+                                        updateAnimation(mDrawable7);
                                         updateProgressView(0);
                                     }
                                     break;
@@ -217,7 +219,7 @@ public class GameActivity extends Activity {
             }
         });
 
-        imageView = (ImageView) findViewById(R.id.game_gif);
+        gifImageView = (GifImageView) findViewById(R.id.game_gif);
         progressBar = (ProgressBar) findViewById(R.id.game_process_bar);
         textView = (TextView) findViewById(R.id.game_process_bubble);
 
@@ -226,13 +228,25 @@ public class GameActivity extends Activity {
         firstButton = (Button) findViewById(R.id.first_choice_btn);
         secondButton = (Button) findViewById(R.id.second_choice_btn);
 
+        try {
+            mDrawable1 = new GifDrawable(getResources(), R.drawable.anim1);
+            mDrawable2 = new GifDrawable(getResources(), R.drawable.anim2);
+            mDrawable3 = new GifDrawable(getResources(), R.drawable.anim3);
+            mDrawable4 = new GifDrawable(getResources(), R.drawable.anim4);
+            mDrawable5 = new GifDrawable(getResources(), R.drawable.anim5);
+            mDrawable6 = new GifDrawable(getResources(), R.drawable.anim6);
+            mDrawable7 = new GifDrawable(getResources(), R.drawable.anim7);
+        } catch (IOException e){
+            Log.e(TAG, "[CREATE GIF Drawable Failed]: " + e.getMessage());
+        }
+
         randomQuestion();
 
         if(game_state == 0){
-            defaultAnimation = R.drawable.anim1;
+            defaultAnimation = mDrawable1;
         }
         else if(game_state == 1) {
-            defaultAnimation = R.drawable.anim5;
+            defaultAnimation = mDrawable5;
         }
         updateAnimation(defaultAnimation);
         updateProgressView(3);
@@ -559,7 +573,7 @@ public class GameActivity extends Activity {
             }else if(game_state == 1){
                 if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())
                     connectToDevice();
-                defaultAnimation = R.drawable.anim5;
+                defaultAnimation = mDrawable5;
                 updateAnimation(defaultAnimation);
 
             }
@@ -577,7 +591,7 @@ public class GameActivity extends Activity {
             else if(game_state == 0){
                 if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())
                     connectToDevice();
-                defaultAnimation = R.drawable.anim1;
+                defaultAnimation = mDrawable1;
                 updateAnimation(defaultAnimation);
             }
         }
@@ -596,36 +610,51 @@ public class GameActivity extends Activity {
         progressBar.setProgress(state_progress);
     }
 
-    private void updateAnimation(Integer resId){
+    private void updateAnimation(GifDrawable drawable){
         if (this.getApplicationContext() == null || this.isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && this.isDestroyed())){
             return;
         }
-        if(resId != R.drawable.anim1 && resId != R.drawable.anim5) {
-
-            Glide.with(this).load(resId).listener(new RequestListener<Integer, GlideDrawable>() {
+//        if(resId != R.drawable.anim1 && resId != R.drawable.anim5) {
+//            Glide.with(this).load(resId).listener(new RequestListener<Integer, GlideDrawable>() {
+//                @Override
+//                public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
+//                    return false;
+//                }
+//
+//                @Override
+//                public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+//                    GifDrawable drawable = (GifDrawable) resource;
+//                    GifDecoder decoder = drawable.getDecoder();
+//                    int duration = 0;
+//
+//                    for (int i = 0; i < drawable.getFrameCount(); i++) {
+//                        duration += decoder.getDelay(i);
+//                    }
+//
+//                    //switch back
+//                    mHandler.sendEmptyMessageDelayed(SUCCESS_PLAY, duration * 5);
+//
+//                    return false;
+//                }
+//            }).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView, 5));
+//        }else{
+//            Glide.with(this).load(resId).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE).into(imageView);
+//        }
+        if(drawable != mDrawable1 && drawable != mDrawable5){
+            drawable.setLoopCount(5);
+            drawable.addAnimationListener(new AnimationListener() {
                 @Override
-                public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                    GifDrawable drawable = (GifDrawable) resource;
-                    GifDecoder decoder = drawable.getDecoder();
-                    int duration = 0;
-
-                    for (int i = 0; i < drawable.getFrameCount(); i++) {
-                        duration += decoder.getDelay(i);
+                public void onAnimationCompleted(int loopNumber) {
+                    Log.i(TAG, "[INFO]: Loop Number: " + loopNumber);
+                    if(loopNumber == 4) {
+                        mHandler.sendEmptyMessage(SUCCESS_PLAY);
+                        Log.i(TAG, "[INFO]: Finished playing GIF");
                     }
-
-                    //switch back
-                    mHandler.sendEmptyMessageDelayed(SUCCESS_PLAY, duration * 5);
-
-                    return false;
                 }
-            }).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView, 5));
+            });
+            gifImageView.setImageDrawable(drawable);
         }else{
-            Glide.with(this).load(resId).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView));
+            gifImageView.setImageDrawable(drawable);
         }
     }
 }
