@@ -7,9 +7,11 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.percent.PercentFrameLayout;
 import android.support.percent.PercentLayoutHelper;
 import android.util.Log;
@@ -31,6 +33,7 @@ import com.bumptech.glide.request.target.Target;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Timestamp;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
@@ -66,6 +69,9 @@ public class GameActivity extends Activity {
     private Button secondButton;
     private Timer promptTimer;
     private Random random;
+    private long lastTimeStamp = -1;
+    private String signalInfo = null;
+
     private SharedPreferences sharedPreferences;
     private int questionId;
 
@@ -98,55 +104,57 @@ public class GameActivity extends Activity {
                         break;
                     case MESSAGE_READ:
                         String info = (String)msg.obj;
-                        switch(info){
-
-                            case "C":
-                                Log.i(TAG, "C Signal Received");
-                                if (game_state == 0) {
+                        long currentTime = SystemClock.elapsedRealtime();
+                        if(signalInfo != null && lastTimeStamp != -1 &&
+                                signalInfo.equals(info) && currentTime - lastTimeStamp <= 30000){
+                            updateProgressView(5);
+                        }else {
+                            switch (info) {
+                                case "C":
                                     updateAnimation(R.drawable.anim2);
                                     updateProgressView(0);
-                                }
-                                break;
-                            case "D":
-                                Log.i(TAG, "D Signal Received");
-                                if (game_state == 0) {
-                                    updateAnimation(R.drawable.anim3);
-                                    updateProgressView(0);
-                                }
-                                break;
-                            case "E":
-                                Log.i(TAG, "E Signal Received");
-                                if (game_state == 0) {
-                                    updateAnimation(R.drawable.anim4);
-                                    updateProgressView(0);
-                                }
-                                break;
-                            case "F":
-                                Log.i(TAG, "F Signal Received");
-                                if(game_state == 1) {
-                                    updateAnimation(R.drawable.anim6);
-                                    updateProgressView(0);
-                                }
-                                break;
-                            case "G":
-                                Log.i(TAG, "G Signal Received");
-                                if (game_state == 1) {
-                                    updateProgressView(0);
-                                    updateAnimation(R.drawable.anim6);
-                                }
-                                break;
-                            case "H":
-                                Log.i(TAG, "H Signal Received");
-                                if (game_state == 1){
-                                    updateAnimation(R.drawable.anim7);
-                                    updateProgressView(0);
-                                }
-                                break;
-                            default:
-                                Log.i(TAG, "[Invalid Signal]: " + info);
-                                break;
+                                    break;
+                                case "D":
+                                    Log.i(TAG, "D Signal Received");
+                                    if (game_state == 0) {
+                                        updateAnimation(R.drawable.anim3);
+                                        updateProgressView(0);
+                                    }
+                                    break;
+                                case "E":
+                                    Log.i(TAG, "E Signal Received");
+                                    if (game_state == 0) {
+                                        updateAnimation(R.drawable.anim4);
+                                        updateProgressView(0);
+                                    }
+                                    break;
+                                case "F":
+                                    Log.i(TAG, "F Signal Received");
+                                    if (game_state == 1) {
+                                        updateAnimation(R.drawable.anim6);
+                                        updateProgressView(0);
+                                    }
+                                    break;
+                                case "G":
+                                    Log.i(TAG, "G Signal Received");
+                                    if (game_state == 1) {
+                                        updateProgressView(0);
+                                        updateAnimation(R.drawable.anim6);
+                                    }
+                                    break;
+                                case "H":
+                                    Log.i(TAG, "H Signal Received");
+                                    if (game_state == 1) {
+                                        updateAnimation(R.drawable.anim7);
+                                        updateProgressView(0);
+                                    }
+                                    break;
+                                default:
+                                    Log.i(TAG, "[Invalid Signal]: " + info);
+                                    break;
+                            }
+                            break;
                         }
-                        break;
                     case MESSAGE_WRITE:
 
                         break;
@@ -288,17 +296,17 @@ public class GameActivity extends Activity {
                     case 0:
                         correctImageView.setBackgroundResource(R.drawable.q1_wrong);
                         correctImageView.setVisibility(View.VISIBLE);
-                        resume();
+                        updateProgressView(4);
                         break;
                     case 1:
                         correctImageView.setBackgroundResource(R.drawable.q2_wrong);
                         correctImageView.setVisibility(View.VISIBLE);
-                        resume();
+                        updateProgressView(4);
                         break;
                     case 2:
                         correctImageView.setBackgroundResource(R.drawable.q3_wrong);
                         correctImageView.setVisibility(View.VISIBLE);
-                        resume();
+                        updateProgressView(4);
                         break;
                     case 3:
                         correctImageView.setBackgroundResource(R.drawable.q_correct);
@@ -338,12 +346,12 @@ public class GameActivity extends Activity {
                     case 3:
                         correctImageView.setBackgroundResource(R.drawable.q4_wrong);
                         correctImageView.setVisibility(View.VISIBLE);
-                        resume();
+                        updateProgressView(4);
                         break;
                     case 4:
                         correctImageView.setBackgroundResource(R.drawable.q5_wrong);
                         correctImageView.setVisibility(View.VISIBLE);
-                        resume();
+                        updateProgressView(4);
                         break;
                 }
             }
@@ -519,15 +527,24 @@ public class GameActivity extends Activity {
     private void updateProgressView(int type){
         switch(type){
             case 1:
-                state_progress += 50;
+                state_progress += 100;
 
-                Log.i(TAG, "state: " + game_state);
+                Log.i(TAG, "state_progress: " + state_progress);
                 break;
             case 0:
                 state_progress += 2;
                 break;
             case 3:
                 Log.i(TAG, "[Load View from Storage]");
+                break;
+            case 4:
+                Log.i(TAG, "state_progress: " + state_progress);
+                Log.i(TAG, "[Wrong Answer]: Wrong answer made for random question");
+                state_progress -= 5;
+                break;
+            case 5:
+                Log.i(TAG, "[Duplicate Signal Received]: Same signal received in 10s");
+                state_progress -= 2;
                 break;
         }
         if(state_progress >= 100){
@@ -547,6 +564,23 @@ public class GameActivity extends Activity {
 
             }
         }
+        else if(state_progress < 0){
+            game_state--;
+            state_progress = 0;
+            Log.i(TAG, "state: " + game_state);
+            if(game_state == -1){
+                game_state = 0;
+                Intent intent = new Intent(this, ResultActivity.class);
+                intent.putExtra("STATE", 1);
+                startActivity(intent);
+            }
+            else if(game_state == 0){
+                if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())
+                    connectToDevice();
+                defaultAnimation = R.drawable.anim1;
+                updateAnimation(defaultAnimation);
+            }
+        }
 
         Log.i(TAG, "STATE PROGRESS: " + state_progress);
 
@@ -563,6 +597,9 @@ public class GameActivity extends Activity {
     }
 
     private void updateAnimation(Integer resId){
+        if (this.getApplicationContext() == null || this.isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && this.isDestroyed())){
+            return;
+        }
         if(resId != R.drawable.anim1 && resId != R.drawable.anim5) {
 
             Glide.with(this).load(resId).listener(new RequestListener<Integer, GlideDrawable>() {
@@ -588,7 +625,7 @@ public class GameActivity extends Activity {
                 }
             }).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView, 5));
         }else{
-             Glide.with(this).load(resId).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView));
+            Glide.with(this).load(resId).diskCacheStrategy(DiskCacheStrategy.NONE).into(new GlideDrawableImageViewTarget(imageView));
         }
     }
 }

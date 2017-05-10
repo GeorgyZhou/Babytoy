@@ -12,5 +12,14 @@
         android:visibility="visible"
         android:scaleType="centerCrop"/>
 
+    <Button
+        app:layout_widthPercent="18%"
+        app:layout_heightPercent="8%"
+        app:layout_marginTopPercent="50%"
+        app:layout_marginLeftPercent="41%"
+        android:id="@+id/return_menu_btn"
+        android:text="@string/return_home"
+        style="@style/MenuButton"
+        />
 
 </android.support.percent.PercentFrameLayout>
