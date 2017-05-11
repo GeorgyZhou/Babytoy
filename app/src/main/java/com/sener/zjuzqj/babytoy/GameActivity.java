@@ -119,7 +119,9 @@ public class GameActivity extends Activity {
                             signalInfo = info;
                             switch (info) {
                                 case "C":
-                                    updateAnimation(mDrawable2);
+                                    Log.i(TAG, "[DRAWABLE LOOP COUNT]: " +mDrawable4.getLoopCount());
+                                    if(mDrawable2.getLoopCount() >= 5)
+                                        updateAnimation(mDrawable2);
                                     updateProgressView(0);
                                     break;
                                 case "D":
@@ -132,7 +134,9 @@ public class GameActivity extends Activity {
                                 case "E":
                                     Log.i(TAG, "E Signal Received");
                                     if (game_state == 0) {
-                                        updateAnimation(mDrawable4);
+                                        Log.i(TAG, "[DRAWABLE LOOP COUNT]: " +mDrawable4.getLoopCount());
+                                        if (mDrawable2.getLoopCount() >= 5)
+                                            updateAnimation(mDrawable4);
                                         updateProgressView(0);
                                     }
                                     break;
