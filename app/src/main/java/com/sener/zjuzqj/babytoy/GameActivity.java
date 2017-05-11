@@ -111,6 +111,8 @@ public class GameActivity extends Activity {
                                 signalInfo.equals(info) && currentTime - lastTimeStamp <= 30000){
                             updateProgressView(5);
                         }else {
+                            lastTimeStamp = currentTime;
+                            signalInfo = info;
                             switch (info) {
                                 case "C":
                                     updateAnimation(mDrawable2);
