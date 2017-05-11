@@ -120,7 +120,7 @@ public class GameActivity extends Activity {
                             switch (info) {
                                 case "C":
                                     if(game_state == 0){
-                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info))) {
+                                        if(animFinished == 0) {
                                             updateAnimation(mDrawable2);
                                         }
                                         updateProgressView(0);
@@ -129,7 +129,7 @@ public class GameActivity extends Activity {
                                 case "D":
                                     Log.i(TAG, "D Signal Received");
                                     if (game_state == 0) {
-                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                        if(animFinished == 0)
                                             updateAnimation(mDrawable3);
                                         updateProgressView(0);
                                     }
@@ -137,7 +137,7 @@ public class GameActivity extends Activity {
                                 case "E":
                                     Log.i(TAG, "E Signal Received");
                                     if (game_state == 0) {
-                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                        if(animFinished == 0)
                                             updateAnimation(mDrawable4);
                                         updateProgressView(0);
                                     }
@@ -145,7 +145,7 @@ public class GameActivity extends Activity {
                                 case "F":
                                     Log.i(TAG, "F Signal Received");
                                     if (game_state == 1) {
-                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                        if(animFinished == 0)
                                             updateAnimation(mDrawable6);
                                         updateProgressView(0);
                                     }
@@ -153,7 +153,7 @@ public class GameActivity extends Activity {
                                 case "G":
                                     Log.i(TAG, "G Signal Received");
                                     if (game_state == 1) {
-                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                        if(animFinished == 0)
                                             updateAnimation(mDrawable6);
                                         updateProgressView(0);
                                     }
