@@ -541,7 +541,7 @@ public class GameActivity extends Activity {
     private void updateProgressView(int type){
         switch(type){
             case 1:
-                state_progress += 100;
+                state_progress += 10;
 
                 Log.i(TAG, "state_progress: " + state_progress);
                 break;
