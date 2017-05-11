@@ -76,6 +76,7 @@ public class GameActivity extends Activity {
     private GifDrawable mDrawable6;
     private GifDrawable mDrawable7;
     private SharedPreferences sharedPreferences;
+    private int animFinished = 0;
     private int questionId;
 
     @Override
@@ -116,26 +117,27 @@ public class GameActivity extends Activity {
                             }
                         }else {
                             firstTimeStamp = currentTime;
-                            signalInfo = info;
                             switch (info) {
                                 case "C":
-                                    Log.i(TAG, "[DRAWABLE LOOP COUNT]: " +mDrawable4.getLoopCount());
-                                    if(mDrawable2.getLoopCount() >= 5)
-                                        updateAnimation(mDrawable2);
-                                    updateProgressView(0);
+                                    if(game_state == 0){
+                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info))) {
+                                            updateAnimation(mDrawable2);
+                                        }
+                                        updateProgressView(0);
+                                    }
                                     break;
                                 case "D":
                                     Log.i(TAG, "D Signal Received");
                                     if (game_state == 0) {
-                                        updateAnimation(mDrawable3);
+                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                            updateAnimation(mDrawable3);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "E":
                                     Log.i(TAG, "E Signal Received");
                                     if (game_state == 0) {
-                                        Log.i(TAG, "[DRAWABLE LOOP COUNT]: " +mDrawable4.getLoopCount());
-                                        if (mDrawable2.getLoopCount() >= 5)
+                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
                                             updateAnimation(mDrawable4);
                                         updateProgressView(0);
                                     }
@@ -143,21 +145,24 @@ public class GameActivity extends Activity {
                                 case "F":
                                     Log.i(TAG, "F Signal Received");
                                     if (game_state == 1) {
-                                        updateAnimation(mDrawable6);
+                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                            updateAnimation(mDrawable6);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "G":
                                     Log.i(TAG, "G Signal Received");
                                     if (game_state == 1) {
+                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                            updateAnimation(mDrawable6);
                                         updateProgressView(0);
-                                        updateAnimation(mDrawable6);
                                     }
                                     break;
                                 case "H":
                                     Log.i(TAG, "H Signal Received");
                                     if (game_state == 1) {
-                                        updateAnimation(mDrawable7);
+                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
+                                                updateAnimation(mDrawable7);
                                         updateProgressView(0);
                                     }
                                     break;
@@ -165,6 +170,7 @@ public class GameActivity extends Activity {
                                     Log.i(TAG, "[Invalid Signal]: " + info);
                                     break;
                             }
+                            signalInfo = info;
                         }
                         lastTimeStamp = currentTime;
                         break;
@@ -172,6 +178,7 @@ public class GameActivity extends Activity {
 
                         break;
                     case SUCCESS_PLAY:
+                        animFinished = 0;
                         updateAnimation(defaultAnimation);
                         break;
                     case PROMPT:
@@ -651,6 +658,7 @@ public class GameActivity extends Activity {
 //        }else{
 //            Glide.with(this).load(resId).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE).into(imageView);
 //        }
+        animFinished = 1;
         if(drawable != mDrawable1 && drawable != mDrawable5){
             drawable.setLoopCount(5);
             drawable.addAnimationListener(new AnimationListener() {
