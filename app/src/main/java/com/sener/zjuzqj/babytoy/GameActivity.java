@@ -658,8 +658,8 @@ public class GameActivity extends Activity {
 //        }else{
 //            Glide.with(this).load(resId).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE).into(imageView);
 //        }
-        animFinished = 1;
         if(drawable != mDrawable1 && drawable != mDrawable5){
+            animFinished = 1;
             drawable.setLoopCount(5);
             drawable.addAnimationListener(new AnimationListener() {
                 @Override
