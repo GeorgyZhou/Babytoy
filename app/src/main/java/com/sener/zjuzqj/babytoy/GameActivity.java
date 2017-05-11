@@ -108,6 +108,8 @@ public class GameActivity extends Activity {
                         break;
                     case MESSAGE_READ:
                         String info = (String)msg.obj;
+                        Log.i(TAG, "[SIGNAL COMMING]: " + info);
+                        Log.i(TAG, "[ANIMFINISHED]: " + animFinished);
                         long currentTime = SystemClock.elapsedRealtime();
                         if(signalInfo != null && signalInfo.equals(info) &&
                                 lastTimeStamp != -1 && currentTime - lastTimeStamp <= 3000){
@@ -161,8 +163,8 @@ public class GameActivity extends Activity {
                                 case "H":
                                     Log.i(TAG, "H Signal Received");
                                     if (game_state == 1) {
-                                        if(animFinished == 0 && (signalInfo == null || !signalInfo.equals(info)))
-                                                updateAnimation(mDrawable7);
+                                        if(animFinished == 0)
+                                            updateAnimation(mDrawable7);
                                         updateProgressView(0);
                                     }
                                     break;
