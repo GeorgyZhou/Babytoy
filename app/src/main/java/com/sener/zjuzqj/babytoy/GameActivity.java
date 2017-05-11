@@ -107,9 +107,11 @@ public class GameActivity extends Activity {
                     case MESSAGE_READ:
                         String info = (String)msg.obj;
                         long currentTime = SystemClock.elapsedRealtime();
-                        if(signalInfo != null && lastTimeStamp != -1 &&
-                                signalInfo.equals(info) && currentTime - lastTimeStamp <= 30000){
-                            updateProgressView(5);
+                        if(signalInfo != null && signalInfo.equals(info)){
+                            if (lastTimeStamp != -1 && currentTime - lastTimeStamp >= 20000){
+                                lastTimeStamp = currentTime;
+                                updateProgressView(5);
+                            }
                         }else {
                             lastTimeStamp = currentTime;
                             signalInfo = info;
@@ -294,7 +296,7 @@ public class GameActivity extends Activity {
                 mHandler.obtainMessage(PROMPT, random.nextInt(2), random.nextInt(5))
                         .sendToTarget();
             }
-        }, 6000 + random.nextInt(2000));
+        }, 18000 + random.nextInt(3000));
     }
 
     private void randomQuestion(){
@@ -556,7 +558,7 @@ public class GameActivity extends Activity {
             case 4:
                 Log.i(TAG, "state_progress: " + state_progress);
                 Log.i(TAG, "[Wrong Answer]: Wrong answer made for random question");
-                state_progress -= 5;
+                state_progress -= 3;
                 break;
             case 5:
                 Log.i(TAG, "[Duplicate Signal Received]: Same signal received in 10s");
