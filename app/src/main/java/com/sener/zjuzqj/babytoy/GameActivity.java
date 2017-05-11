@@ -65,6 +65,7 @@ public class GameActivity extends Activity {
     private Button secondButton;
     private Timer promptTimer;
     private Random random;
+    private long firstTimeStamp = -1;
     private long lastTimeStamp = -1;
     private String signalInfo = null;
     private GifDrawable mDrawable1;
@@ -107,13 +108,14 @@ public class GameActivity extends Activity {
                     case MESSAGE_READ:
                         String info = (String)msg.obj;
                         long currentTime = SystemClock.elapsedRealtime();
-                        if(signalInfo != null && signalInfo.equals(info)){
-                            if (lastTimeStamp != -1 && currentTime - lastTimeStamp >= 20000){
-                                lastTimeStamp = currentTime;
+                        if(signalInfo != null && signalInfo.equals(info) &&
+                                lastTimeStamp != -1 && currentTime - lastTimeStamp <= 3000){
+                            if (firstTimeStamp != -1 && currentTime - firstTimeStamp >= 20000){
+                                firstTimeStamp = currentTime;
                                 updateProgressView(5);
                             }
                         }else {
-                            lastTimeStamp = currentTime;
+                            firstTimeStamp = currentTime;
                             signalInfo = info;
                             switch (info) {
                                 case "C":
@@ -159,8 +161,9 @@ public class GameActivity extends Activity {
                                     Log.i(TAG, "[Invalid Signal]: " + info);
                                     break;
                             }
-                            break;
                         }
+                        lastTimeStamp = currentTime;
+                        break;
                     case MESSAGE_WRITE:
 
                         break;
