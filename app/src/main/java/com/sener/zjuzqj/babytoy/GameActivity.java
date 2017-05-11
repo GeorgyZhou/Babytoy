@@ -76,7 +76,6 @@ public class GameActivity extends Activity {
     private GifDrawable mDrawable6;
     private GifDrawable mDrawable7;
     private SharedPreferences sharedPreferences;
-    private int animFinished = 0;
     private int questionId;
 
     @Override
@@ -108,8 +107,6 @@ public class GameActivity extends Activity {
                         break;
                     case MESSAGE_READ:
                         String info = (String)msg.obj;
-                        Log.i(TAG, "[SIGNAL COMMING]: " + info);
-                        Log.i(TAG, "[ANIMFINISHED]: " + animFinished);
                         long currentTime = SystemClock.elapsedRealtime();
                         if(signalInfo != null && signalInfo.equals(info) &&
                                 lastTimeStamp != -1 && currentTime - lastTimeStamp <= 3000){
@@ -122,49 +119,42 @@ public class GameActivity extends Activity {
                             switch (info) {
                                 case "C":
                                     if(game_state == 0){
-                                        if(animFinished == 0) {
-                                            updateAnimation(mDrawable2);
-                                        }
+                                        updateAnimation(mDrawable2);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "D":
                                     Log.i(TAG, "D Signal Received");
                                     if (game_state == 0) {
-                                        if(animFinished == 0)
-                                            updateAnimation(mDrawable3);
+                                        updateAnimation(mDrawable3);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "E":
                                     Log.i(TAG, "E Signal Received");
                                     if (game_state == 0) {
-                                        if(animFinished == 0)
-                                            updateAnimation(mDrawable4);
+                                        updateAnimation(mDrawable4);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "F":
                                     Log.i(TAG, "F Signal Received");
                                     if (game_state == 1) {
-                                        if(animFinished == 0)
-                                            updateAnimation(mDrawable6);
+                                        updateAnimation(mDrawable6);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "G":
                                     Log.i(TAG, "G Signal Received");
                                     if (game_state == 1) {
-                                        if(animFinished == 0)
-                                            updateAnimation(mDrawable6);
+                                        updateAnimation(mDrawable6);
                                         updateProgressView(0);
                                     }
                                     break;
                                 case "H":
                                     Log.i(TAG, "H Signal Received");
                                     if (game_state == 1) {
-                                        if(animFinished == 0)
-                                            updateAnimation(mDrawable7);
+                                        updateAnimation(mDrawable7);
                                         updateProgressView(0);
                                     }
                                     break;
@@ -180,7 +170,6 @@ public class GameActivity extends Activity {
 
                         break;
                     case SUCCESS_PLAY:
-                        animFinished = 0;
                         updateAnimation(defaultAnimation);
                         break;
                     case PROMPT:
@@ -661,7 +650,6 @@ public class GameActivity extends Activity {
 //            Glide.with(this).load(resId).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE).into(imageView);
 //        }
         if(drawable != mDrawable1 && drawable != mDrawable5){
-            animFinished = 1;
             drawable.setLoopCount(5);
             drawable.addAnimationListener(new AnimationListener() {
                 @Override
